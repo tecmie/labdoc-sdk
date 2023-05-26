@@ -1,10 +1,10 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import { Example } from '../src';
+import { Demo } from '../src';
 
 it('renders correctly', () => {
   const tree = renderer
-    .create(<Example text="Clicked this many times" />)
+    .create(<Demo text="Clicked this many times" />)
     .toJSON();
   expect(tree).toMatchSnapshot();
 });

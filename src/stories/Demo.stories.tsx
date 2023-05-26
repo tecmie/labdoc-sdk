@@ -1,15 +1,15 @@
 import React from 'react';
 import { Meta, StoryFn } from '@storybook/react';
 
-import { Example } from '..';
+import Demo from '../demo';
 
 export default {
-  title: 'Example',
-  component: Example,
+  title: 'Demo',
+  component: Demo,
   argTypes: {},
-} as Meta<typeof Example>;
+} as Meta<typeof Demo>;
 
-const Template: StoryFn<typeof Example> = (args) => <Example {...args} />;
+const Template: StoryFn<typeof Demo> = (args) => <Demo {...args} />;
 
 export const Primary = Template.bind({});
 
