@@ -1,38 +1,148 @@
-# React Package Starter
+# Labdoc SDK
+Labdoc SDK is a collection of tools for interacting with the Labdoc API. It provides a Query client for making API requests and a PDF parser for parsing PDF documents client side. It also provides a NextJS HOC for setting up the React Query client and the PDF parser in your NextJS app.
 
-This is a simple and slightly opinionated starter kit for developing and publishing React packages. It comes with a several pre-configured tools, so you could focus on coding instead of configuring a project for the nth time.
 
-## Getting started
+## Setting up with NextJS
 
-```console
-npx degit TimMikeladze/tsup-react-package-starter my-react-package
+To provide the trpc methods into your Nextjs app you need to wrap your app with the `withTRPC` HOC. This HOC provides the `trpc` object to your app. The `trpc` object contains the `ReactQueryClient` and `TRPCClient` instances. The `ReactQueryClient` instance is used to cache the results of the API requests and the `TRPCClient` instance is used to make the API requests. The `trpc` object also contains the `useQuery` and `useMutation` hooks from `react-query` which you can use to make API requests.
 
-cd my-react-package && git init 
 
-yarn && yarn dev
+```tsx
+
+import { trpc } from "@tecmie/labdoc-sdk";
+
+
+const MyNextApp = ({
+  Component,
+  pageProps: { session, ...pageProps },
+}) => {
+  return (
+    <SessionProvider session={session}>
+      <ErrorBoundary>
+          <Component {...pageProps} />
+      </ErrorBoundary>
+    </SessionProvider>
+  );
+};
+
+export default trpc.withTRPC(MyApp);
+
 ```
 
-❗Important note: This project uses [yarn](https://yarnpkg.com/) for managing dependencies. If you want to use another package manager, remove the `yarn.lock` and control-f for usages of `yarn` in the project and replace them with your package manager of choice.
 
-## What's included?
+# The Inference Client
 
-- ⚡️[tsup](https://github.com/egoist/tsup) - The simplest and fastest way to bundle your TypeScript libraries. Used to bundle package as ESM and CJS modules. Supports TypeScript, Code Splitting, PostCSS, and more out of the box.
-- 🔗 [Yalc](https://github.com/wclr/yalc) - Better workflow than npm | yarn link for package authors.
-- 📖 [Storybook](https://storybook.js.org/) - Build UI components and pages in isolation. It streamlines UI development, testing, and documentation.
-- 🧪 [Jest](https://jestjs.io/) - A testing framework for JavaScript. Preconfigured to work with TypeScript and JSX.
-- 🔼 [Release-it](https://github.com/release-it/release-it/) - release-it is a command line tool to automatically generate a new GitHub Release and populates it with the changes (commits) made since the last release.
-- 🐙 [Test & Publish via Github Actions](https://docs.github.com/en/actions) - CI/CD workflows for your package. Run tests on every commit plus integrate with Github Releases to automate publishing package to NPM and Storybook to Github Pages.
-- 📄 [Commitizen](https://github.com/commitizen/cz-cli) — When you commit with Commitizen, you'll be prompted to fill out any required commit fields at commit time.
-- 🚓 [Commitlint](https://github.com/conventional-changelog/commitlint) — Checks that your commit messages meet the conventional commit format.
-- 🐶 [Husky](https://github.com/typicode/husky) — Running scripts before committing.
-- 🚫 [lint-staged](https://github.com/okonet/lint-staged) — Run linters on git staged files
-- 🖌 [Renovate](https://github.com/renovatebot/renovate) - Universal dependency update tool that fits into your workflows. Configured to periodically check your dependencies for updates and send automated pull requests.
-- ☑️ [ESLint](https://eslint.org/) - A linter for JavaScript. Includes a simple configuration for React projects based on the recommended ESLint and AirBnB configs.
-- 🎨 [Prettier](https://prettier.io/) - An opinionated code formatter.
+This client composes React Query with trpc to provide a simple interface for interacting with the Labdoc API. To initialize this client, you must provide a API secret key in `x-secret` headers. This SDK already provides a helper for that, so that the `TRPCClient` instance is used to make requests to the Labdoc API, and the `ReactQueryClient` instance is used to cache the results of those requests.
 
-## Usage
 
-### Developing
+# The PDF Parser
+
+This sdk comes with a react hook to assist with handling uploads for your pdf document, the client is able to parse this document client side and return the parsed data to you. This is useful for when you want to preview the document before uploading it to the server. The hook is called `usePDFParser` and it takes in a file object and returns a `UsePDFParserReturn` object. The `UsePDFParserReturn` object has the following properties:
+
+```ts
+export interface UsePDFParserReturn {
+  documentURL: string;
+  pdfPage: PDFPageProxy;
+  document: PDFDocumentProxy;
+  parsePageText: (pageNumber: number) => Promise<string>;
+  executeUpload: (uploadedFile: string) => void;
+}
+```
+
+Example usage
+The code block uses the usePDFParser hook from the `@tecmie/labdoc-sdk` package.
+
+
+```tsx
+
+  import { usePDFParser } from "@tecmie/labdoc-sdk";
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { document, executeUpload } = usePDFParser({
+    canvasRef: canvasRef,
+  });
+
+  /** Form submission handler */
+  const onSubmit = async (data: UploadFormOptions) => {
+
+    // Create a blob URL from the uploaded file
+    const blobUrl = URL.createObjectURL(data.document[0]);
+
+    // Execute the upload
+    await executeUpload(blobUrl);
+    console.log({ document, blobUrl });
+  };
+```
+
+The code above initializes a canvasRef using the useRef hook and passes it to the `usePDFParser` hook as an argument. The `usePDFParser` hook returns an object that contains a document property and an `executeUpload` function. 
+
+The `onSubmit` function is an asynchronous function that takes in an object of type UploadFormOptions as its argument. It creates a blob URL from the uploaded file and passes it to the executeUpload function. Finally, it logs the document object and the blobUrl to the console.
+
+
+## Parsing Page Text
+
+The `parsePageText` method is a helper function from the PDF Parser that takes in a page number and returns the text on that page. It is useful for when you want to preview the text on a page before uploading the document to the server. The code block below shows how to use the `parsePageText` method.
+
+```tsx
+
+  import { usePDFParser } from "@tecmie/labdoc-sdk";
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { document, executeUpload, parsePageText } = usePDFParser({
+    canvasRef: canvasRef,
+  });
+
+  /** Form submission handler */
+  const onSubmit = async (data: UploadFormOptions) => {
+
+    // Create a blob URL from the uploaded file
+    const blobUrl = URL.createObjectURL(data.document[0]);
+
+    // Execute the upload
+    await executeUpload(blobUrl);
+
+    // Parse the text on the first page
+    const text = await parsePageText(1);
+    console.log({ document, blobUrl, text });
+  };
+```
+
+## Call the Inference Method
+
+
+You need to first parse your page text before calling the inference method, the API method accepts a diagnosis `string argument and you can simply do something like this:
+
+```tsx
+
+  import { usePDFParser } from "@tecmie/labdoc-sdk";
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { document, executeUpload, parsePageText } = usePDFParser({
+    canvasRef: canvasRef,
+  });
+
+  /** Form submission handler */
+  const onSubmit = async (data: UploadFormOptions) => {
+
+    // Create a blob URL from the uploaded file
+    const blobUrl = URL.createObjectURL(data.document[0]);
+
+    // Execute the upload
+    await executeUpload(blobUrl);
+
+    // Parse the text on the first page
+    const text = await parsePageText(1);
+
+    // Call the inference method
+    const diagnosis = await callInference.mutateAsync({ diagnosis: text });
+    console.log({ document, blobUrl, text, diagnosis });
+  };
+```
+Under the hood, the inference method relies on `react-query` and you also have access to the `isLoading`, `isError`, `isSuccess` and `data` properties of the `callInference` object. You can use these properties to render a loading indicator, an error message or the result of the inference method.
+
+
+
+## Contributing
 
 Watch and rebuild code with `tsup` and runs Storybook to preview your UI during development.
 
