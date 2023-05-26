@@ -1,13 +1,19 @@
 {
-  "name": "tsup-react-package-starter",
-  "description": "",
-  "version": "0.0.0",
-  "author": "",
+  "name": "@tecmie/labdoc-sdk",
+  "description": "Labdoc SDK for React",
+  "version": "0.1.0",
+  "author": "Andrew Miracle <andrew@tecmie.com>",
   "license": "",
-  "keywords": [],
+  "keywords": [
+    "ai",
+    "gpt",
+    "telehealth",
+    "labdoc",
+    "tecmie"
+  ],
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/labdoc-sdk.git"
   },
   "scripts": {
     "dev": "concurrently \"yarn build --watch\" \"yarn storybook\" \"yarn test:watch\" ",
