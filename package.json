@@ -1,7 +1,7 @@
 {
   "name": "@tecmie/labdoc-sdk",
   "description": "Labdoc SDK for React",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Andrew Miracle <andrew@tecmie.com>",
   "license": "",
   "keywords": [
