@@ -87,8 +87,6 @@
 //   }))
 // );
 
-
-
 // // export const pages = store((state: { numPages: any; }) => state.numPages);
 // // export const pages = store.getState().numPages;
 export default {};

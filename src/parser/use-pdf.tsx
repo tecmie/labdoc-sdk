@@ -96,7 +96,7 @@ export const usePdf = ({
     }
 
     pdfjs.getDocument(config).promise.then(
-      loadedPdfDocument => {
+      (loadedPdfDocument) => {
         setPdfDocument(loadedPdfDocument);
 
         if (isFunction(onDocumentLoadSuccessRef.current)) {
@@ -168,7 +168,7 @@ export const usePdf = ({
 
     if (pdfDocument) {
       pdfDocument.getPage(page).then(
-        loadedPdfPage => {
+        (loadedPdfPage) => {
           setPdfPage(loadedPdfPage);
 
           if (isFunction(onPageLoadSuccessRef.current)) {

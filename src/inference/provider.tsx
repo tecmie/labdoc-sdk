@@ -1,4 +1,4 @@
-import { httpBatchLink, loggerLink } from '@trpc/client';
+import { createTRPCProxyClient, httpBatchLink, loggerLink } from '@trpc/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import superjson from 'superjson';
@@ -31,7 +31,7 @@ export const LabAIClientProvider = ({
 
   const [trpcClient] = useState(() =>
     trpc.createClient({
-      transformer: superjson,
+      // transformer: superjson,
       links: [
         loggerLink({
           enabled: (opts) =>

@@ -52,16 +52,15 @@ export function usePDFParser({
   });
 
   const executeUpload = async (uploadedFile: string) => {
-    Boolean(uploadedFile) && (
-      await dispatch({ type: ActionType.SET_DOC_URL, payload: uploadedFile })
-      );
+    Boolean(uploadedFile) &&
+      (await dispatch({ type: ActionType.SET_DOC_URL, payload: uploadedFile }));
   };
 
   /** PDF Text content extraction handler */
   const _extractTextFromPdfPage = async (pageNumber: number) => {
     try {
-      if(!pdf) {
-        return "";
+      if (!pdf) {
+        return '';
       }
       const totalPages = pdf.numPages;
 
@@ -87,7 +86,6 @@ export function usePDFParser({
     numPages: 0,
     getPage: () => Promise.resolve(pdfPage),
   } as unknown as PDFDocumentProxy;
-
 
   return {
     pdfPage,

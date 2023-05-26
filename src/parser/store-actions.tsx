@@ -1,9 +1,9 @@
-  /**
-   * @param {State} draft
-   * @param {Action} action
-   * @returns {void}
-   */
-
+/**
+ * @param {State} draft
+ * @param {Action} action
+ * @returns {void}
+ */
+/* eslint-disable  no-param-reassign */
 import { produce } from 'immer';
 import { PDFDocumentProxy } from 'pdfjs-dist';
 
@@ -15,9 +15,9 @@ export enum ActionType {
 }
 
 export interface DiagnosisReport {
-    [key: string]: any;
-    ReportLines: string[];
-    Summary: string;
+  [key: string]: any;
+  ReportLines: string[];
+  Summary: string;
 }
 
 // interface State {
@@ -29,18 +29,17 @@ export interface DiagnosisReport {
 // }
 
 export interface StoreState {
-      upload: PDFDocumentProxy | null;
+  upload: PDFDocumentProxy | null;
   uploadedFile: PDFDocumentProxy | null;
   diagnosisReport: any;
   numPages: number;
   docURL: string;
-    // docURL: string;
-    // uploadedFile: string;
-    // diagnosisReport: [string | null, DiagnosisReport | null];
-    // numPages: number;
-    // upload?: PDFDocumentProxy;
+  // docURL: string;
+  // uploadedFile: string;
+  // diagnosisReport: [string | null, DiagnosisReport | null];
+  // numPages: number;
+  // upload?: PDFDocumentProxy;
 }
-
 
 export type StoreReducerAction =
   | { type: ActionType.SET_UPLOADED_FILE; payload: PDFDocumentProxy }
@@ -48,11 +47,10 @@ export type StoreReducerAction =
   | { type: ActionType.SET_DOC_URL; payload: string }
   | { type: ActionType.SET_NUM_PAGES; payload: number };
 
-
-  /**
-   * @name initialState
-   * @type {State}
-   */
+/**
+ * @name initialState
+ * @type {State}
+ */
 const initialState: StoreState = {
   upload: null,
   uploadedFile: null,
@@ -63,26 +61,28 @@ const initialState: StoreState = {
 
 type TReducer = (state: StoreState, action: StoreReducerAction) => StoreState;
 
-const reducer: TReducer = produce((draft: StoreState, action: StoreReducerAction) => {
-  switch (action.type) {
-    case ActionType.SET_UPLOADED_FILE:
-      draft.upload = action.payload;
-      draft.uploadedFile = action.payload;
-      break;
-    case ActionType.SCAN_AI:
-      draft.diagnosisReport = action.payload;
-      break;
-    case ActionType.SET_DOC_URL:
-      draft.numPages = 0;
-      draft.docURL = action.payload;
-      break;
-    case ActionType.SET_NUM_PAGES:
-      draft.numPages = action.payload;
-      break;
-    default:
-      break;
+const reducer: TReducer = produce(
+  (draft: StoreState, action: StoreReducerAction) => {
+    switch (action.type) {
+      case ActionType.SET_UPLOADED_FILE:
+        draft.upload = action.payload;
+        draft.uploadedFile = action.payload;
+        break;
+      case ActionType.SCAN_AI:
+        draft.diagnosisReport = action.payload;
+        break;
+      case ActionType.SET_DOC_URL:
+        draft.numPages = 0;
+        draft.docURL = action.payload;
+        break;
+      case ActionType.SET_NUM_PAGES:
+        draft.numPages = action.payload;
+        break;
+      default:
+        break;
+    }
   }
-});
+);
 
 const setUploadedFile = (file: PDFDocumentProxy) => ({
   type: ActionType.SET_UPLOADED_FILE,
@@ -104,4 +104,11 @@ const setNumPages = (pages: number) => ({
   payload: pages,
 });
 
-export { initialState, reducer, setUploadedFile, scanai, setDocURL, setNumPages };
+export {
+  initialState,
+  reducer,
+  setUploadedFile,
+  scanai,
+  setDocURL,
+  setNumPages,
+};
