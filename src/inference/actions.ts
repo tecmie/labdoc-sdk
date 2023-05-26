@@ -1,5 +1,4 @@
 import { trpc } from './trpc';
 
 // @ts-ignore
-const inference = trpc.scanner.read.useMutation();
-
+export const inference = trpc.scanner.read.useMutation();

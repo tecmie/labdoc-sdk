@@ -1,3 +1,3 @@
 export interface ScannerInput {
-    diagnosis: string[];
+  diagnosis: string[];
 }
