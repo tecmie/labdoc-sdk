@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 // import { inference } from './inference/actions'
 import { trpc } from './inference/trpc';
 

@@ -1,4 +1,4 @@
-import { trpc } from './trpc';
+// import { trpc } from './trpc';
 
 // @ts-ignore
-export const inference = trpc.scanner.read.useMutation();
+// export const inference = trpc.scanner.read.useMutation();

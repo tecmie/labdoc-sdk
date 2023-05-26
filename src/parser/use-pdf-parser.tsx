@@ -1,6 +1,6 @@
 /* eslint-disable */
 import * as React from 'react';
-import { usePdf } from '@mikecousins/react-pdf';
+import { usePdf } from './use-pdf';
 import { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import { useEffect } from 'react';
 import { store } from './store';
@@ -13,17 +13,22 @@ export interface UsePDFParserReturn {
   document: PDFDocumentProxy;
   documentURL: string;
   executeUpload: (uploadedFile: string) => void;
-  parsePageText: (pageNumber: number) => Promise<string>;
-  pdfPage: PDFPageProxy;
+  parsePageText: (pageNumber: number) => Promise<string | undefined>;
+  pdfPage?: PDFPageProxy;
 }
 
 export function usePDFParser({
   canvasRef,
 }: UseFileUploadOptions): UsePDFParserReturn {
-  const docURL = store((state) => state.docURL);
-  const setDocURL = store((state) => state.setDocURL);
-  const setNumpages = store((state) => state.setNumPages);
-  const setUploadedFile = store((state) => state.setUploadedFile);
+  // const docURL = store((state) => state.docURL);
+  // const setDocURL = store((state) => state.setDocURL);
+  // const setNumpages = store((state) => state.setNumPages);
+  // const setUploadedFile = store((state) => state.setUploadedFile);
+
+  const docURL = store.getState().docURL
+  const setDocURL = store.getState().setDocURL
+  const setNumpages = store.getState().setNumPages
+  const setUploadedFile = store.getState().setUploadedFile
 
   useEffect(() => {
     console.log('docURL', docURL);
@@ -50,6 +55,9 @@ export function usePDFParser({
   /** PDF Text content extraction handler */
   const _extractTextFromPdfPage = async (pageNumber: number) => {
     try {
+      if(!pdf) {
+        return "";
+      }
       const totalPages = pdf.numPages;
 
       if (pageNumber < 1 || pageNumber > totalPages) {
@@ -69,12 +77,19 @@ export function usePDFParser({
     }
   };
 
+  // create a dummy pdf document` proxy
+  const pdfDocument = {
+    numPages: 0,
+    getPage: () => Promise.resolve(pdfPage),
+  } as unknown as PDFDocumentProxy;
+
+
   return {
     pdfPage,
     documentURL: docURL,
     executeUpload,
     parsePageText: _extractTextFromPdfPage,
-    document: pdf,
+    document: pdf || pdfDocument,
   };
 }
 

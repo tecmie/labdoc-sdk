@@ -1,8 +1,10 @@
 export * from './demo';
 
 /* Inference and API Interface */
-export * from './inference/actions';
-export * from './inference/provider';
+// export  { inference } from './inference/actions';
+// export { trpc } from './inference/trpc';
+export { LabAIClientProvider } from './inference/provider';
 
 /** PDF and upload parser hooks */
-export * from './parser/use-pdf-parser';
+// export { usePDFParser } from './parser/use-pdf-parser';
+// export { pages } from './parser/store';

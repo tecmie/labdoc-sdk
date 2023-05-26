@@ -2,7 +2,7 @@
 /* eslint-disable no-param-reassign */
 
 import { PDFDocumentProxy } from 'pdfjs-dist';
-import { create } from 'zustand';
+import { createStore as create } from 'zustand/vanilla';
 import { immer } from 'zustand/middleware/immer';
 
 export interface FileDropzoneProps {
@@ -25,7 +25,7 @@ type State = {
   docURL: string;
   numPages: number;
   scanOp: Record<string, any>;
-  upload: FileDropzoneProps[];
+  upload?: PDFDocumentProxy;
 };
 
 type Actions = {
@@ -33,7 +33,7 @@ type Actions = {
   setDocURL: (url: string) => void;
   setNumPages: (pages: number) => void;
   setPDFDocument?: (doc: PDFDocumentProxy) => void;
-  setUploadedFile: (file: FileDropzoneProps[]) => void;
+  setUploadedFile: (file: PDFDocumentProxy) => void;
 };
 
 export type DocumentStore = State & Actions;
@@ -45,7 +45,7 @@ export const store = create<DocumentStore>(
     docURL: 'url://to/pdf/file.pdf',
     numPages: 0,
     diagnosisReport: [null, {} as DiagnosisReport],
-    upload: [],
+    upload: undefined,
     currentStep: 0,
     scanOp: {
       status: 'idle',
@@ -54,9 +54,9 @@ export const store = create<DocumentStore>(
       isSucces: false,
       isLoading: false,
     },
-    setUploadedFile: (file: FileDropzoneProps[]) =>
+    setUploadedFile: (file: PDFDocumentProxy) =>
       set((state) => {
-        state.upload = file;
+        state.upload = file as any;
       }),
     scanai: (report: any) => {
       try {
@@ -87,4 +87,7 @@ export const store = create<DocumentStore>(
   }))
 );
 
-export const pages = store((state) => state.numPages);
+
+
+// export const pages = store((state: { numPages: any; }) => state.numPages);
+// export const pages = store.getState().numPages;
