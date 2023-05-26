@@ -1,7 +1,7 @@
 {
   "name": "@tecmie/labdoc-sdk",
   "description": "Labdoc SDK for React",
-  "version": "0.1.1",
+  "version": "0.1.4",
   "author": "Andrew Miracle <andrew@tecmie.com>",
   "license": "",
   "keywords": [
@@ -90,7 +90,7 @@
     "@trpc/next": "10.0.0-rc.4",
     "@trpc/react-query": "10.0.0-rc.4",
     "@trpc/server": "10.0.0-rc.4",
-    "immer": "^10.0.1",
+    "immer": "^10.0.2",
     "pdfjs-dist": "^3.5.141",
     "superjson": "^1.12.3",
     "zustand": "^4.3.7"

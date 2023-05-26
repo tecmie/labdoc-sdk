@@ -1,3 +1,4 @@
+import 'immer';
 export * from './demo';
 
 /* Inference and API Interface */
@@ -6,5 +7,5 @@ export * from './demo';
 export { LabAIClientProvider } from './inference/provider';
 
 /** PDF and upload parser hooks */
-// export { usePDFParser } from './parser/use-pdf-parser';
+export { usePDFParser } from './parser/use-pdf-parser';
 // export { pages } from './parser/store';

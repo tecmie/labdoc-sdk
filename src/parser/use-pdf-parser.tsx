@@ -1,9 +1,10 @@
 /* eslint-disable */
-import * as React from 'react';
+import React from 'react';
 import { usePdf } from './use-pdf';
 import { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import { useEffect } from 'react';
-import { store } from './store';
+import { useStoreContext } from './store-context';
+import { ActionType } from './store-actions';
 
 export interface UseFileUploadOptions {
   canvasRef: React.RefObject<HTMLCanvasElement>;
@@ -23,12 +24,14 @@ export function usePDFParser({
   // const docURL = store((state) => state.docURL);
   // const setDocURL = store((state) => state.setDocURL);
   // const setNumpages = store((state) => state.setNumPages);
+
   // const setUploadedFile = store((state) => state.setUploadedFile);
 
-  const docURL = store.getState().docURL
-  const setDocURL = store.getState().setDocURL
-  const setNumpages = store.getState().setNumPages
-  const setUploadedFile = store.getState().setUploadedFile
+  const { dispatch, docURL } = useStoreContext();
+  // const docURL = store.getState().docURL
+  // const setDocURL = store.getState().setDocURL
+  // const setNumpages = store.getState().setNumPages
+  // const setUploadedFile = store.getState().setUploadedFile
 
   useEffect(() => {
     console.log('docURL', docURL);
@@ -40,8 +43,8 @@ export function usePDFParser({
     canvasRef,
     onDocumentLoadSuccess(document) {
       console.log('[usePDFParser] PDF document loaded successfully');
-      setNumpages(document.numPages);
-      setUploadedFile(document);
+      dispatch({ type: ActionType.SET_NUM_PAGES, payload: document.numPages });
+      dispatch({ type: ActionType.SET_UPLOADED_FILE, payload: document });
     },
     onDocumentLoadFail() {
       console.log('[usePDFParser] Failed to load PDF document');
@@ -49,7 +52,9 @@ export function usePDFParser({
   });
 
   const executeUpload = async (uploadedFile: string) => {
-    Boolean(uploadedFile) && (await setDocURL(uploadedFile));
+    Boolean(uploadedFile) && (
+      await dispatch({ type: ActionType.SET_DOC_URL, payload: uploadedFile })
+      );
   };
 
   /** PDF Text content extraction handler */
