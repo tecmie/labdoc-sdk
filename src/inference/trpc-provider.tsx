@@ -10,7 +10,7 @@ type ProviderProps = {
   secret: string;
 };
 
-export const LabAIClientProvider = ({
+export const LabTrpcProvider = ({
   children,
   defaultQueryClient,
   httpRpcURL,
@@ -18,8 +18,8 @@ export const LabAIClientProvider = ({
 }: ProviderProps) => {
   const getBaseUrl = () => {
     if (typeof window !== 'undefined') return ''; // browser should use relative url
-    // return httpRpcURL || `https://labai.tecmie.africa`; // dev SSR should use localhost
-    return httpRpcURL || `http://localhost:3001`; // dev SSR should use localhost
+    return httpRpcURL || `https://labai.tecmie.africa`; // dev SSR should use localhost
+    // return httpRpcURL || `http://localhost:3001`; // dev SSR should use localhost
   };
 
   const secretOrKey = secret ?? process.env.INFERENCE_SECRET;

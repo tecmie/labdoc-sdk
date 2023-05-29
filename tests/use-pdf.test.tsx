@@ -1,32 +1,32 @@
 // import React from 'react';
 // import { render, wait, waitForDomChange } from '@testing-library/react';
-// import Pdf from '../src';
+// import Pdf from '../src/parser/use-pdf';
 // import { DocumentInitParameters } from 'pdfjs-dist/types/src/display/api';
 
-// jest.mock('pdfjs-dist', () => ({
-//   version: '1.0',
-//   GlobalWorkerOptions: {
-//     workerSrc: '',
-//   },
-//   getDocument: jest.fn((config: DocumentInitParameters) => ({
-//     promise: config.url?.includes('fail_document')
-//       ? Promise.reject()
-//       : Promise.resolve({
-//           getPage: jest.fn(() =>
-//             config.url?.includes('fail_page')
-//               ? Promise.reject()
-//               : Promise.resolve({
-//                   getViewport: jest.fn(() => ({ width: 0, height: 0 })),
-//                   render: jest.fn(() => ({
-//                     promise: config.url?.includes('fail_render')
-//                       ? Promise.reject()
-//                       : Promise.resolve(),
-//                   })),
-//                 })
-//           ),
-//         }),
-//   })),
-// }));
+// // jest.mock('pdfjs-dist', () => ({
+// //   version: '1.0',
+// //   GlobalWorkerOptions: {
+// //     workerSrc: '',
+// //   },
+// //   getDocument: jest.fn((config: DocumentInitParameters) => ({
+// //     promise: config.url?.includes('fail_document')
+// //       ? Promise.reject()
+// //       : Promise.resolve({
+// //           getPage: jest.fn(() =>
+// //             config.url?.includes('fail_page')
+// //               ? Promise.reject()
+// //               : Promise.resolve({
+// //                   getViewport: jest.fn(() => ({ width: 0, height: 0 })),
+// //                   render: jest.fn(() => ({
+// //                     promise: config.url?.includes('fail_render')
+// //                       ? Promise.reject()
+// //                       : Promise.resolve(),
+// //                   })),
+// //                 })
+// //           ),
+// //         }),
+// //   })),
+// // }));
 
 // describe('Pdf', () => {
 // //   it('renders children', async () => {
@@ -94,7 +94,7 @@
 //           onPageRenderSuccess={onPageRenderSuccess}
 //           onPageRenderFail={onPageRenderFail}
 //         >
-//           {({ canvas }) => canvas}
+//           {({ canvas }: any) => canvas}
 //         </Pdf>
 //       );
 
@@ -151,3 +151,7 @@
 //     });
 //   });
 // });
+
+describe('Mock test', () => {
+  it.todo('renders children');
+});

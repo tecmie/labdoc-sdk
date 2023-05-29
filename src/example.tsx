@@ -2,7 +2,7 @@ import * as React from 'react';
 import { trpc } from './inference/trpc';
 
 import { usePDFParser } from './parser/use-pdf-parser';
-import { LabAIClientProvider } from './inference/provider';
+import { LabTrpcProvider } from './inference/trpc-provider';
 
 export type DemoProps = {
   text?: String;
@@ -41,12 +41,12 @@ export function Demo(props: DemoProps) {
   };
 
   return (
-    <LabAIClientProvider secret="secret">
+    <LabTrpcProvider secret="secret">
       <input type="file" onChange={handleFileChange} />
       <button onClick={handleSubmit} type="button">
         {`${props.text}`}
       </button>
-    </LabAIClientProvider>
+    </LabTrpcProvider>
   );
 }
 

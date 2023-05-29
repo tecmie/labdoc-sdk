@@ -17,8 +17,16 @@ type DecoratedProcedureRecord<
     : never;
 };
 
-// @ts-ignore
-export const proxy: DecoratedProcedureRecord<any, AnyRouter> =
+export type CreateLabProxyOptions = {
+  customHttpLink?: string;
+  secretOrKey: string;
+};
+
+export const createLabProxy = ({
+  secretOrKey,
+  customHttpLink,
+}: CreateLabProxyOptions): DecoratedProcedureRecord<any, AnyRouter> =>
+  // @ts-ignore
   createTRPCProxyClient({
     links: [
       loggerLink({
@@ -28,14 +36,12 @@ export const proxy: DecoratedProcedureRecord<any, AnyRouter> =
       }),
       httpBatchLink({
         // url: `http://localhost:3001/api/trpc`,
-        url: `https://labai.tecmie.africa/api/trpc`,
+        url: customHttpLink ?? `https://labai.tecmie.africa/api/trpc`,
         /**
          * Headers will be called on each request.
          */
         headers: () => ({
-          'x-secret':
-            process.env.NEXT_PUBLIC_SECRET ||
-            'sk_P9uPoekyZLV5MEUHCsgPZ4DTmp99m8DUoxy4SpVzSkDsi2azKJ6mhN83',
+          'x-secret': secretOrKey,
         }),
       }),
     ],

@@ -1,10 +1,7 @@
 import 'immer';
 
 /* Inference and API Interface */
-// export  { inference } from './inference/actions';
-export { trpc, proxy } from './inference/trpc';
-export { LabAIClientProvider } from './inference/provider';
+export { LabTrpcProvider } from './inference/trpc-provider';
 
 /** PDF and upload parser hooks */
 export { usePDFParser } from './parser/use-pdf-parser';
-// export { pages } from './parser/store';
