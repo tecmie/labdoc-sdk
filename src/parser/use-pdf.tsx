@@ -1,30 +1,30 @@
+import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import * as pdfjs from 'pdfjs-dist';
 import { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import { DocumentInitParameters } from 'pdfjs-dist/types/src/display/api';
 
-function isFunction(value: any): value is Function {
-  return typeof value === 'function';
-}
+const isFunction = (value: any): value is Function =>
+  typeof value === 'function';
 
 type PDFRenderTask = ReturnType<PDFPageProxy['render']>;
 
 type HookProps = {
+  cMapPacked?: boolean;
+  cMapUrl?: string;
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   file: string;
-  onDocumentLoadSuccess?: (document: PDFDocumentProxy) => void;
   onDocumentLoadFail?: () => void;
-  onPageLoadSuccess?: (page: PDFPageProxy) => void;
+  onDocumentLoadSuccess?: (document: PDFDocumentProxy) => void;
   onPageLoadFail?: () => void;
-  onPageRenderSuccess?: (page: PDFPageProxy) => void;
+  onPageLoadSuccess?: (page: PDFPageProxy) => void;
   onPageRenderFail?: () => void;
-  scale?: number;
-  rotate?: number;
+  onPageRenderSuccess?: (page: PDFPageProxy) => void;
   page?: number;
-  cMapUrl?: string;
-  cMapPacked?: boolean;
-  workerSrc?: string;
+  rotate?: number;
+  scale?: number;
   withCredentials?: boolean;
+  workerSrc?: string;
 };
 
 type HookReturnValues = {
@@ -113,6 +113,7 @@ export const usePdf = ({
 
   useEffect(() => {
     // draw a page of the pdf
+    // eslint-disable-next-line no-shadow
     const drawPDF = (page: PDFPageProxy) => {
       // Because this page's rotation option overwrites pdf default rotation value,
       // calculating page rotation option value from pdf default and this component prop rotate.
@@ -146,6 +147,7 @@ export const usePdf = ({
         viewport,
       });
 
+      // eslint-disable-next-line consistent-return
       return renderTask.current.promise.then(
         () => {
           renderTask.current = null;

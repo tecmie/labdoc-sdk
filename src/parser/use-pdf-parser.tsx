@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React from 'react';
-import { usePdf } from './use-pdf';
+/* eslint-disable no-console */
+import React, { useEffect } from 'react';
 import { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
-import { useEffect } from 'react';
+import { usePdf } from './use-pdf';
 import { useStoreContext } from './store-context';
-import { ActionType } from './store-actions';
+import { ContextStoreActions as ActionType } from './store-actions';
 
 export interface UseFileUploadOptions {
   canvasRef: React.RefObject<HTMLCanvasElement>;
@@ -52,12 +51,11 @@ export function usePDFParser({
   });
 
   const executeUpload = async (uploadedFile: string) => {
-    Boolean(uploadedFile) &&
-      (await dispatch({ type: ActionType.SET_DOC_URL, payload: uploadedFile }));
+    dispatch({ type: ActionType.SET_DOC_URL, payload: uploadedFile });
   };
 
   /** PDF Text content extraction handler */
-  const _extractTextFromPdfPage = async (pageNumber: number) => {
+  const extractTextFromPdfPage = async (pageNumber: number) => {
     try {
       if (!pdf) {
         return '';
@@ -78,6 +76,7 @@ export function usePDFParser({
       return extractedText;
     } catch (error) {
       console.error('Error extracting text from PDF page:', error);
+      throw new Error(error as any);
     }
   };
 
@@ -91,7 +90,7 @@ export function usePDFParser({
     pdfPage,
     documentURL: docURL,
     executeUpload,
-    parsePageText: _extractTextFromPdfPage,
+    parsePageText: extractTextFromPdfPage,
     document: pdf || pdfDocument,
   };
 }
