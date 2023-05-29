@@ -2,7 +2,7 @@ import { createTRPCProxyClient, httpBatchLink, loggerLink } from '@trpc/client';
 import { AnyRouter, ProcedureRouterRecord, AnyProcedure } from '@trpc/server';
 import { DecorateProcedure } from '@trpc/react-query/shared';
 
-type DecoratedProcedureRecord<
+export type DecoratedProcedureRecord<
   TProcedures extends ProcedureRouterRecord,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   TRouter extends AnyRouter

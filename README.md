@@ -2,31 +2,127 @@
 
 Labdoc SDK is a collection of tools for interacting with the Labdoc API. It provides a Query client for making API requests and a PDF parser for parsing PDF documents client side. It also provides a NextJS HOC for setting up the React Query client and the PDF parser in your NextJS app.
 
-## Setting up with NextJS
+## The Inference Client
 
-To provide the trpc methods into your Nextjs app you need to wrap your app with the `withTRPC` HOC. This HOC provides the `trpc` object to your app. The `trpc` object contains the `ReactQueryClient` and `TRPCClient` instances. The `ReactQueryClient` instance is used to cache the results of the API requests and the `TRPCClient` instance is used to make the API requests. The `trpc` object also contains the `useQuery` and `useMutation` hooks from `react-query` which you can use to make API requests.
+This client leverages the power of trpc and React's Context API to provide a simple and efficient interface for interacting with the Labdoc API. To initialize this client, you must provide an API secret key, which is used to authenticate your requests with the Labdoc API.
 
-```tsx
-import { trpc } from '@tecmie/labdoc-sdk';
+### Setting up the Provider
 
-const MyNextApp = ({ Component, pageProps: { session, ...pageProps } }) => {
-  return (
-    <SessionProvider session={session}>
-      <ErrorBoundary>
-        <Component {...pageProps} />
-      </ErrorBoundary>
-    </SessionProvider>
-  );
-};
+To enable the usage of Labdoc API throughout your application, you first need to set up the `LabProvider` at the root level of your application. You can provide your API secret key and optional custom HTTP link `customHttpLink` as props to this provider, when a custom HTTP link is not provided, the default HTTP link `https://labai.tecmie.africa` is used.
 
-export default trpc.withTRPC(MyApp);
+```jsx
+import { LabProvider } from '@tecmie/labdoc-sdk';
+
+<LabProvider secretOrKey="my-secret-or-key">
+  <App />
+</LabProvider>;
 ```
 
-# The Inference Client
+The `LabProvider` makes use of context to provide the necessary functions and hooks to its descendant components.
 
-This client composes React Query with trpc to provide a simple interface for interacting with the Labdoc API. To initialize this client, you must provide a API secret key in `x-secret` headers. This SDK already provides a helper for that, so that the `TRPCClient` instance is used to make requests to the Labdoc API, and the `ReactQueryClient` instance is used to cache the results of those requests.
+### Calling the Inference Method
 
-# The PDF Parser
+The `useLabInference` hook provides an easy way to interact with the Labdoc API. Before calling the inference method, ensure that your page text is properly parsed.
+
+```jsx
+import { usePDFParser, useLabInference } from '@tecmie/labdoc-sdk';
+
+const canvasRef = useRef < HTMLCanvasElement > null;
+const { document, executeUpload, parsePageText } = usePDFParser({ canvasRef });
+const { query } = useLabInference();
+
+/** Form submission handler */
+const onSubmit = async (data: UploadFormOptions) => {
+  // Create a blob URL from the uploaded file
+  const blobUrl = URL.createObjectURL(data.document[0]);
+
+  // Execute the upload
+  await executeUpload(blobUrl);
+
+  // Parse the text on the first page
+  const text = await parsePageText(1);
+
+  // Call the inference method
+  const diagnosis = await query({ documents: [text] });
+  console.log({ document, blobUrl, text, diagnosis });
+};
+```
+
+Under the hood, the `useLabInference` hook utilizes the `LabBaseContext` to make requests to the Labdoc API, providing a seamless experience of data fetching with built-in caching and error handling mechanisms.
+
+Please refer to the `useLabInference` hook API documentation for more details.
+
+## `useLabInference` Hook
+
+`useLabInference` is a custom hook provided by the Labdoc SDK. This hook is responsible for making requests to the Labdoc Inference API and returns the results of those requests.
+
+### Usage
+
+Before you can make use of the `useLabInference` hook, make sure your component is a descendant of the `LabProvider` component.
+
+```jsx
+import { LabProvider } from '@tecmie/labdoc-sdk';
+
+<LabProvider secretOrKey="my-secret-or-key">
+  <App />
+</LabProvider>;
+```
+
+Once the `LabProvider` is set up, you can use the `useLabInference` hook within your functional components.
+
+```jsx
+import { useLabInference } from '@tecmie/labdoc-sdk';
+
+function YourComponent() {
+  const { query } = useLabInference();
+}
+```
+
+### API
+
+The `useLabInference` hook exposes an object with the following methods:
+
+- `query`: This function is used to make requests to the Labdoc API. The function accepts an argument of type `LabQueryRequest` (an object with a `documents` array property) and returns a Promise that resolves with the data from the API.
+
+```jsx
+const { query } = useLabInference();
+
+// Use parsed text as a parameter for the Labdoc API
+const text = '...'; // your parsed text
+const response = await query({ documents: [text] });
+```
+
+The response object will be of the `LabQueryResponse` type as detailed in the previous section of this document.
+
+Please ensure that error handling is properly set up as this method may throw an error if the API request fails.
+
+### Example
+
+```jsx
+import { usePDFParser, useLabInference } from '@tecmie/labdoc-sdk';
+
+function YourComponent() {
+  const canvasRef = useRef < HTMLCanvasElement > null;
+  const { document, executeUpload, parsePageText } = usePDFParser({
+    canvasRef,
+  });
+  const { query } = useLabInference();
+
+  const onSubmit = async (data: UploadFormOptions) => {
+    const blobUrl = URL.createObjectURL(data.document[0]);
+    await executeUpload(blobUrl);
+    const text = await parsePageText(1);
+    const diagnosis = await query({ documents: [text] });
+    console.log({ document, blobUrl, text, diagnosis });
+  };
+}
+```
+
+In this example, the text from a PDF is parsed and used as an argument for the `query` function provided by the `useLabInference` hook. The result of this query is logged to the console.
+
+## `usePDFParser` PDF Parser Hook
+
+> This hook is still experimental and might have a few bugs in it
 
 This sdk comes with a react hook to assist with handling uploads for your pdf document, the client is able to parse this document client side and return the parsed data to you. This is useful for when you want to preview the document before uploading it to the server. The hook is called `usePDFParser` and it takes in a file object and returns a `UsePDFParserReturn` object. The `UsePDFParserReturn` object has the following properties:
 
@@ -99,37 +195,6 @@ const onSubmit = async (data: UploadFormOptions) => {
 };
 ```
 
-## Call the Inference Method
-
-You need to first parse your page text before calling the inference method, the API method accepts a diagnosis `string argument and you can simply do something like this:
-
-```tsx
-import { usePDFParser } from '@tecmie/labdoc-sdk';
-
-const canvasRef = useRef<HTMLCanvasElement>(null);
-const { document, executeUpload, parsePageText } = usePDFParser({
-  canvasRef: canvasRef,
-});
-
-/** Form submission handler */
-const onSubmit = async (data: UploadFormOptions) => {
-  // Create a blob URL from the uploaded file
-  const blobUrl = URL.createObjectURL(data.document[0]);
-
-  // Execute the upload
-  await executeUpload(blobUrl);
-
-  // Parse the text on the first page
-  const text = await parsePageText(1);
-
-  // Call the inference method
-  const diagnosis = await callInference.mutateAsync({ diagnosis: text });
-  console.log({ document, blobUrl, text, diagnosis });
-};
-```
-
-Under the hood, the inference method relies on `react-query` and you also have access to the `isLoading`, `isError`, `isSuccess` and `data` properties of the `callInference` object. You can use these properties to render a loading indicator, an error message or the result of the inference method.
-
 ## Contributing
 
 Watch and rebuild code with `tsup` and runs Storybook to preview your UI during development.
@@ -151,22 +216,6 @@ Build package with `tsup` for production.
 ```console
 yarn build
 ```
-
-### Linking
-
-Often times you want to `link` the package you're developing to another project locally to test it out to circumvent the need to publish it to NPM.
-
-For this we use [yalc](https://github.com/wclr/yalc) which is a tool for local package development and simulating the publishing and installation of packages.
-
-In a project where you want to consume your package simply run:
-
-```console
-npx yalc link my-react-package
-# or
-yarn yalc add my-react-package
-```
-
-Learn more about `yalc` [here](https://github.com/wclr/yalc).
 
 ### Testing
 
@@ -205,19 +254,3 @@ When you are ready to publish to NPM simply run the following command:
 ```console
 yarn publish
 ```
-
-#### Auto publish after Github Release
-
-❗Important note: in order to publish package to NPM you must add your token as a Github Action secret. Learn more on how to configure your repository and publish packages through Github Actions [here](https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages).
-
-## PostCSS
-
-[tsup](https://github.com/egoist/tsup) supports PostCSS out of the box. Simply run `yarn add postcss -D` add a `postcss.config.js` file to the root of your project, then add any plugins you need. Learn more how to configure PostCSS [here](https://tsup.egoist.dev/#css-support).
-
-Additionally consider using the [tsup](https://github.com/egoist/tsup) configuration option `injectStyle` to inject the CSS directly into your Javascript bundle instead of outputting a separate CSS file.
-
-## Built something using this starter-kit?
-
-That's awesome! Feel free to add it to the list.
-
-- [next-auth-mui](https://github.com/TimMikeladze/next-auth-mui) - Sign-in dialog for NextAuth built with MUI and React. Detects configured OAuth and Email providers and renders buttons or input fields for each respectively. Fully themeable, extensible and customizable to support custom credential flows.
